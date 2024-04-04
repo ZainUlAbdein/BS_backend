@@ -22,11 +22,10 @@ import json
 #         else:
 #             return Response({'error': 'Search query is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-from rest_framework import serializers
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from .external_api import YTMusic  # Assuming you have an external API class named YTMusic
 
 class SearchResultSerializer(serializers.Serializer):
     query = serializers.CharField(max_length=255)
@@ -36,8 +35,10 @@ class SearchResultSerializer(serializers.Serializer):
         return SearchResult.objects.create(**validated_data)
 
 class SearchAPIView(APIView):
+    serializer_class = SearchResultSerializer
+
     def post(self, request, *args, **kwargs):
-        serializer = SearchResultSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             query = serializer.validated_data['query']
             ytmusic = YTMusic()
