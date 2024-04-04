@@ -144,8 +144,8 @@ CORS_ORIGIN_ALLOW_ALL = True  # Allow requests from any origin (not recommended 
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000',
-    'http://localhost:4200',  # Replace with the origin of your frontend application
-    # Add more origins as needed
+    'http://localhost:4200', 
+    'https://bs-backend-fa0wxw0e3-zainulabdeins-projects.vercel.app/',
 ]
 
 CORS_ALLOWED_ORIGINS = [
