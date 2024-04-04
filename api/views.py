@@ -11,41 +11,40 @@ import json
 
 
 
-class SearchAPIView(generics.CreateAPIView):
+# class SearchAPIView(generics.CreateAPIView):
     
-    def create(self, request, *args, **kwargs):
-        query = request.data.get('query')
-        if query:
-            ytmusic = YTMusic()
-            result = ytmusic.search(query)
-            return Response({'query': query, 'result': result}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({'error': 'Search query is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-# from rest_framework import serializers, status
-# from rest_framework.response import Response
-# from rest_framework.views import APIView
-# from .external_api import YTMusic  # Assuming you have an external API class named YTMusic
-
-# class SearchResultSerializer(serializers.Serializer):
-#     query = serializers.CharField(max_length=255)
-#     result = serializers.JSONField()
-
-#     def create(self, validated_data):
-#         return SearchResult.objects.create(**validated_data)
-
-# class SearchAPIView(APIView):
-#     serializer_class = SearchResultSerializer
-
-#     def post(self, request, *args, **kwargs):
-#         serializer = self.serializer_class(data=request.data)
-#         if serializer.is_valid():
-#             query = serializer.validated_data['query']
+#     def create(self, request, *args, **kwargs):
+#         query = request.data.get('query')
+#         if query:
 #             ytmusic = YTMusic()
 #             result = ytmusic.search(query)
-#             serializer.validated_data['result'] = result
-#             return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#             return Response({'query': query, 'result': result}, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response({'error': 'Search query is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+from rest_framework import serializers, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+class SearchResultSerializer(serializers.Serializer):
+    query = serializers.CharField(max_length=255)
+    result = serializers.JSONField()
+
+    def create(self, validated_data):
+        return SearchResult.objects.create(**validated_data)
+
+class SearchAPIView(APIView):
+    serializer_class = SearchResultSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            query = serializer.validated_data['query']
+            ytmusic = YTMusic()
+            result = ytmusic.search(query)
+            serializer.validated_data['result'] = result
+            return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
