@@ -36,7 +36,7 @@ class SearchResultSerializer(serializers.Serializer):
 class SearchAPIView(APIView):
     serializer_class = SearchResultSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             query = serializer.validated_data['query']
