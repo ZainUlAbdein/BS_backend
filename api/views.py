@@ -78,7 +78,7 @@ def get_chart_data(request):
     ytmusic = YTMusic()
 
     # Fetching the chart data for global (ZZ)
-    chart_data = ytmusic.get_charts('IR')
+    chart_data = ytmusic.get_charts('AA')
 
     # List to store video data
     video_list = []
