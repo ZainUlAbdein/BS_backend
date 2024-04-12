@@ -31,7 +31,7 @@ class SearchResultSerializer(serializers.Serializer):
     result = serializers.JSONField()
 
     def create(self, validated_data):
-        return SearchResult.objects.create(**validated_data)
+        return SearchResult.objects.create(**validated_data) # type: ignore
 
 class SearchAPIView(APIView):
     serializer_class = SearchResultSerializer
@@ -65,6 +65,50 @@ def play_audio(request):
 
     audio_url = get_audio_url(video_id)
     return JsonResponse({'audio_url': audio_url})
+
+
+
+from django.http import StreamingHttpResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from pytube import YouTube
+from io import BytesIO
+
+class AudioAPIView(APIView):
+    def get_audio_blob(self, video_id):
+        try:
+            # Construct the YouTube URL using the video ID
+            url = f"https://www.youtube.com/watch?v={video_id}"
+
+            # Create a YouTube object
+            yt = YouTube(url)
+
+            # Get the highest quality audio stream
+            audio_stream = yt.streams.filter(only_audio=True).first()
+
+            # Get the audio stream as bytes
+            audio_stream_bytes = BytesIO()
+            audio_stream.stream_to_buffer(audio_stream_bytes)
+
+            return audio_stream_bytes.getvalue()
+        except Exception as e:
+            print("Error:", str(e))
+            return None
+
+    def get(self, request, video_id):
+        try:
+            # Get audio blob
+            audio_blob = self.get_audio_blob(video_id)
+            if audio_blob:
+                # Return the audio blob as a streaming response
+                response = StreamingHttpResponse(iter([audio_blob]), content_type='audio/mpeg')
+                response['Content-Disposition'] = f'attachment; filename="{video_id}_audio.mp3"'
+                return response
+            else:
+                return Response("Failed to get audio blob.", status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
